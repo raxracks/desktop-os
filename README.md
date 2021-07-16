@@ -2,8 +2,6 @@
 
 ![screenshot](images/0.png)
 
-[Video with an explanation of the development process.](https://www.youtube.com/watch?v=FaILnmUYS_U)
-
 #### It's not tetris, so why?
 Yes, tetris is great, but I wanted to try building a desktop experience on top of tetris OS.
 
