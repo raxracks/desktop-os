@@ -1,17 +1,17 @@
-# TETRIS-OS: An operating system that only plays Tetris.
+# DESKTOP-OS: A desktop experience built on tetris OS
 
 ![screenshot](images/0.png)
 
 [Video with an explanation of the development process.](https://www.youtube.com/watch?v=FaILnmUYS_U)
 
 #### Features:
-- It's Tetris.
 - 32-bit (x86)
 - Fully custom bootloader
 - Soundblaster 16 driver
 - Custom music track runner
 - Fully hardcoded tetris theme
 - Double-buffered 60 FPS graphics at 320x200 pixels with custom 8-bit RGB palette
+- PS/2 Mouse support (kinda broken)
 
 #### Resources Used
 - [osdev.org wiki](https://wiki.osdev.org/Main_Page)
@@ -20,9 +20,7 @@
 - [James Molloy's Kernel Development Tutorials](http://www.jamesmolloy.co.uk/tutorial_html/)
 
 ### Building & Running
-~~**NOTE**: This has *only* been tested in an emulator. Real hardware might not like it.~~
-
- EDIT: this is not true anymore! [@parkerlreed has run this on a Thinkpad T510](https://github.com/jdah/tetris-os/issues/5#issuecomment-824507979).
+**NOTE**: This has *only* been tested in an emulator. Real hardware might not like it.
 
 #### Mac OS
 For the cross-compiler: `$ brew tap nativeos/i386-elf-toolchain && brew install i386-elf-binutils i386-elf-gcc`
