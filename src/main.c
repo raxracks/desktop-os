@@ -11,6 +11,7 @@
 #include "fpu.h"
 #include "sound.h"
 #include "music.h"
+#include "desktop.h"
 
 #define FPS 30
 #define LEVELS 30
@@ -509,74 +510,7 @@ static void render_game_over() {
     );
 }
 
-static void step() {
-    bool stopped = !move(0, 1);
-
-    if (stopped && state.stopped) {
-        // twice stop = end for this tetromino
-        done();
-    }
-
-    state.stopped = stopped;
-}
-
-void reset(u32 level) {
-    // initialize game state
-    memset(&state, 0, sizeof(state));
-    state.frames_since_step = FRAMES_PER_STEP[0];
-    state.level = 0;
-    state.lines_left = state.level * 10 + 10;
-    spawn();
-}
-
 static void update() {
-    if (state.game_over) {
-        if (keyboard_char('\n')) {
-            reset(0);
-        }
-
-        return;
-    }
-
-    // un-flash flashing tiles, remove destroy tiles
-    for (size_t y = 0; y < BOARD_HEIGHT; y++) {
-        bool destroy = false;
-
-        for (size_t x = 0; x < BOARD_WIDTH; x++) {
-            u8 data = state.board[y][x];
-
-            if (data & TILE_FLAG_DESTROY) {
-                state.board[y][x] = NONE;
-                destroy = true;
-            } else {
-                state.board[y][x] &= ~TILE_FLAG_FLASH;
-            }
-        }
-
-        if (destroy) {
-            if (y != 0) {
-                memmove(
-                    &state.board[1],
-                    &state.board[0],
-                    sizeof(state.board[0]) * y
-                );
-            }
-
-            memset(&state.board[0], NONE, sizeof(state.board[0]));
-        }
-    }
-
-    // spawn a new tetromino if the current one is done
-    if (state.curr.done && !spawn()) {
-        state.game_over = true;
-        return;
-    }
-
-    if (state.destroy) {
-        state.destroy = false;
-        return;
-    }
-
     const bool control_states[NUM_CONTROLS] = {
         keyboard_char('a'),
         keyboard_char('d'),
@@ -628,64 +562,6 @@ static void update() {
     }
 }
 
-static void render() {
-    screen_clear(COLOR(0, 0, 0));
-    render_border();
-    render_board();
-    render_ui();
-
-    if (state.game_over) {
-        render_game_over();
-    }
-}
-
-void update_menu() {
-    if (keyboard_char('\n')) {
-        reset(0);
-        state.menu = false;
-    }
-}
-
-void render_menu() {
-    screen_clear(COLOR(0, 0, 0));
-
-    // render logo
-    size_t logo_width = strlen(LOGO[0]),
-           logo_x = (SCREEN_WIDTH - (logo_width * TILE_SIZE)) / 2,
-           logo_y = TILE_SIZE * 3;
-
-    for (i32 x = -1; x < (i32) logo_width + 1; x++) {
-        render_tile(BORDER, logo_x + (x * TILE_SIZE), logo_y - (TILE_SIZE * 2));
-        render_tile(BORDER, logo_x + (x * TILE_SIZE), logo_y + (TILE_SIZE * (1 + LOGO_HEIGHT)));
-    }
-
-    for (size_t y = 0; y < LOGO_HEIGHT; y++) {
-        for (size_t x = 0; x < logo_width; x++) {
-            char c = LOGO[y][x];
-
-            if (c == ' ' || c == '\t' || c == '\n') {
-                continue;
-            }
-
-            render_tile(
-                GREEN + ((((state.frames / 10) + (6 - (c - 'A'))) / 6) % 8),
-                logo_x + (x * TILE_SIZE),
-                logo_y + (y * TILE_SIZE)
-            );
-        }
-    }
-
-    const char *play = "PRESS ENTER TO PLAY";
-    font_str_doubled(
-        play,
-        (SCREEN_WIDTH - font_width(play)) / 2,
-        logo_y + ((LOGO_HEIGHT + 6) * TILE_SIZE),
-        (state.frames / 6) % 2 == 0 ?
-            COLOR(6, 6, 2) :
-            COLOR(7, 7, 3)
-    );
-}
-
 void _main(u32 magic) {
     idt_init();
     isr_init();
@@ -704,51 +580,5 @@ void _main(u32 magic) {
         sound_master(255);
     }
 
-    state.menu = true;
-
-
-    bool last_music_toggle = false;
-    u32 last_frame = 0, last = 0;
-
-    while (true) {
-        const u32 now = (u32) timer_get();
-
-        if (sound_enabled() && now != last) {
-            music_tick();
-            sound_tick();
-            last = now;
-        }
-
-        if ((now - last_frame) > (TIMER_TPS / FPS)) {
-            last_frame = now;
-
-            if (state.menu) {
-                update_menu();
-                render_menu();
-            } else {
-                update();
-                render();
-            }
-
-            if (sound_enabled() && keyboard_char('m')) {
-                if (!last_music_toggle) {
-                    state.music = !state.music;
-                    sound_master(state.music ? 255 : 0);
-                }
-
-                last_music_toggle = true;
-            } else {
-                last_music_toggle = false;
-            }
-
-            // controlled in system.c
-            const char *notification = get_notification();
-            if (notification != NULL) {
-                font_str_doubled(notification, 0, 0, COLOR(6, 1, 1));
-            }
-
-            screen_swap();
-            state.frames++;
-        }
-    }
+    DisplayDesktop();
 }
