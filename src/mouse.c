@@ -8,6 +8,7 @@ i8 rel_mouse_y = 0;     //signed char
 int mouse_x = 0;
 int mouse_y = 0;
 int mouse_sensitivity = 1;
+int mouse_size = 10;
 
 //Mouse functions
 void mouse_handler(struct regs *a_r) //struct regs *a_r (not used but just there)
@@ -109,16 +110,35 @@ void mouse_install()
     irq_install(12, mouse_handler);
 }
 
-void InitializeMouse(int starting_x, int starting_y, int sensitivity) {
+void InitializeMouse(int starting_x, int starting_y, int sensitivity, int cursor_size) {
     mouse_x = starting_x;
     mouse_y = starting_y;
     mouse_sensitivity = sensitivity;
+    mouse_size = cursor_size;
     mouse_install();
 }
 
 void UpdateMouse() {
-    mouse_x += (rel_mouse_x / mouse_sensitivity);
-    mouse_y -= (rel_mouse_y / mouse_sensitivity);
+    if(rel_mouse_x > 0.1) {
+        rel_mouse_x -= 0.1;
+    } 
+    else if(rel_mouse_x < -0.1) {
+        rel_mouse_x += 0.1;
+    } else {
+        rel_mouse_x = 0;
+    }
+
+    if(rel_mouse_y > 0.1) {
+        rel_mouse_y -= 0.1;
+    }
+    else if(rel_mouse_y < -0.1) {
+        rel_mouse_y += 0.1;
+    } else {
+        rel_mouse_y = 0;
+    }
+
+    mouse_x += rel_mouse_x;
+    mouse_y -= rel_mouse_y;
 
     if(mouse_x < 0) mouse_x = 0;
     if(mouse_y < 0) mouse_y = 0;

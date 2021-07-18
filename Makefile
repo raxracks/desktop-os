@@ -63,14 +63,14 @@ iso: img
 	mkisofs -pad -b boot.img -R -o boot.iso boot.img
 
 qemu-mac: img
-	qemu-system-i386.exe -drive format=raw,file=$(IMG) -d cpu_reset -monitor stdio -device sb16 -audiodev coreaudio,id=coreaudio,out.frequency=48000,out.channels=2,out.format=s32
+	qemu-system-i386 -drive format=raw,file=$(IMG) -d cpu_reset -monitor stdio -device sb16 -audiodev coreaudio,id=coreaudio,out.frequency=48000,out.channels=2,out.format=s32
 
 qemu-pulse: img
-	qemu-system-i386.exe -drive format=raw,file=$(IMG) -d cpu_reset -monitor stdio -device sb16 -audiodev pulseaudio,id=pulseaudio,out.frequency=48000,out.channels=2,out.format=s32
+	qemu-system-i386 -drive format=raw,file=$(IMG) -d cpu_reset -monitor stdio -device sb16 -audiodev pulseaudio,id=pulseaudio,out.frequency=48000,out.channels=2,out.format=s32
 
 qemu-sdl: img
-	qemu-system-i386.exe -display sdl -drive format=raw,file=$(IMG) -d cpu_reset -monitor stdio -audiodev sdl,id=sdl,out.frequency=48000,out.channels=2,out.format=s32 -device sb16,audiodev=sdl
+	qemu-system-i386 -display sdl -drive format=raw,file=$(IMG) -d cpu_reset -monitor stdio -audiodev sdl,id=sdl,out.frequency=48000,out.channels=2,out.format=s32 -device sb16,audiodev=sdl
 
 qemu-no-audio: img
-	qemu-system-i386.exe -drive format=raw,file=$(IMG) -d cpu_reset -monitor stdio
+	qemu-system-i386 -drive format=raw,file=$(IMG) -d cpu_reset -monitor stdio
 

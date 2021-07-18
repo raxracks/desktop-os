@@ -8,7 +8,7 @@ int currentIndex = 0;
 
 struct UIElement UIElements[n];
 
-void UIButton(const char *s, size_t x, size_t y, size_t textX, size_t textY, size_t width, size_t height, u8 foreground, u8 background) {
+void UIButton(const char *s, size_t x, size_t y, size_t textX, size_t textY, size_t width, size_t height, u8 foreground, u8 background, int (*callback)(void)) {
     UIElements[currentIndex].s = s;
     UIElements[currentIndex].x = x;
     UIElements[currentIndex].y = y;
@@ -18,11 +18,12 @@ void UIButton(const char *s, size_t x, size_t y, size_t textX, size_t textY, siz
     UIElements[currentIndex].height = height;
     UIElements[currentIndex].foreground = foreground;
     UIElements[currentIndex].background = background;
+    UIElements[currentIndex].callback = callback;
 
     currentIndex++;
 }
 
-void UIRect(size_t x, size_t y, size_t width, size_t height, u8 color) {
+void UIRect(size_t x, size_t y, size_t width, size_t height, u8 color, int (*callback)(void)) {
     UIElements[currentIndex].s = NULL;
     UIElements[currentIndex].x = x;
     UIElements[currentIndex].y = y;
@@ -32,8 +33,23 @@ void UIRect(size_t x, size_t y, size_t width, size_t height, u8 color) {
     UIElements[currentIndex].height = height;
     UIElements[currentIndex].foreground = NULL;
     UIElements[currentIndex].background = color;
+    UIElements[currentIndex].callback = callback;
 
     currentIndex++;
+}
+
+bool Intersect(int aX, int aY, int aWidth, int aHeight, int bX, int bY, int bWidth, int bHeight) {
+    return (bX > aX && bX < aX + aWidth && bY > aY && bY < aY + aHeight);
+}
+
+void CheckMouse(int mouse_x, int mouse_y) {
+    for(int i = 0; i < n; i++) {
+        if(UIElements[i].background != NULL) {
+            if(Intersect(UIElements[i].x, UIElements[i].y, UIElements[i].width, UIElements[i].height, mouse_x, mouse_y, 1, 1)) {
+                UIElements[i].callback();
+            }
+        }
+    }
 }
 
 void DrawUI() {
