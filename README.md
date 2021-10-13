@@ -1,4 +1,4 @@
-# DESKTOP-OS: A desktop experience built on tetris OS
+# DESKTOP-OS: A desktop experience built on tetris OS 
 
 ![screenshot](images/0.png)
 
