@@ -10,7 +10,7 @@ Yes, tetris is great, but I wanted to try building a desktop experience on top o
 - Fully custom bootloader
 - Soundblaster 16 driver
 - Custom music track runner
-- Fully hardcoded tetris theme
+- Fully hardcoded tetris theme 
 - Double-buffered 60 FPS graphics at 320x200 pixels with custom 8-bit RGB palette
 - PS/2 Mouse support (kinda broken)
 
